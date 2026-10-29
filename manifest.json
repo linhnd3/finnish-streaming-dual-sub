@@ -30,7 +30,7 @@
   "web_accessible_resources": [
     {
       "resources": ["main/background/injected.js"],
-      "matches": ["https://areena.yle.fi/*", "https://yle.fi/selkouutiset*", "https://yle.fi/a/*", "https://www.ruutu.fi/*"]
+      "matches": ["https://areena.yle.fi/*", "https://yle.fi/*", "https://www.ruutu.fi/*"]
     }
   ],
   "action": {
