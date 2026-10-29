@@ -1,6 +1,5 @@
 .dual-sub-extension-section {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   gap: 16px;
   padding: 4px 8px;
@@ -443,21 +442,25 @@
   margin-right: 6px;
 }
 
-/* Narrow players (e.g. the inline player on yle.fi/selkouutiset):
-   let the toolbar wrap to its own row instead of pushing the player's
-   right controls (fullscreen...) out of view, and make it more compact. */
+/* "More" menu: in wide players the items sit inline as before.
+   In narrow players (e.g. the inline player on yle.fi/selkouutiset) they move into
+   a menu above the control bar, so the player's own controls keep their place. */
 [class*="PlayerUI__UI"] {
   container-type: inline-size;
 }
 
-[class^="BottomControlBar__LeftControls"]:has(> .dual-sub-extension-section) {
-  flex-wrap: wrap;
-  min-width: 0;
+.dual-sub-more-items {
+  display: contents;
 }
 
-@container (max-width: 1150px) {
+.dual-sub-more-button {
+  display: none;
+}
+
+@container (max-width: 1199px) {
   .dual-sub-extension-section {
     gap: 8px;
+    padding: 0;
   }
 
   .dual-sub-extension-section svg {
@@ -465,17 +468,37 @@
     height: 22px;
   }
 
+  .dual-sub-more-button {
+    display: block;
+  }
+
+  .dual-sub-more-items {
+    display: none;
+  }
+
+  /* Positioned against the player's control bar */
+  .dual-sub-more-items.open {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    position: absolute;
+    bottom: 100%;
+    left: 20px;
+    max-width: calc(100% - 40px);
+    padding: 6px 10px;
+    background: rgba(28, 28, 28, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    z-index: 2;
+  }
+
   #yle-dual-sub-settings-button {
     margin-left: 0 !important;
   }
-
-  .dual-sub-blur-mode-label,
-  .dual-sub-extension-section > a[href$="/updates"] {
-    display: none;
-  }
 }
 
-@container (max-width: 600px) {
+@container (max-width: 699px) {
   .dual-sub-extension-section > span:first-child {
     display: none;
   }

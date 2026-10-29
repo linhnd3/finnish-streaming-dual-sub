@@ -545,6 +545,13 @@ async function addDualSubExtensionSection() {
     <div class="dual-sub-extension-section">
       <span>Dual Sub:</span>
       <input id="dual-sub-switch" class="dual-sub-switch" type="checkbox" ${dualSubEnabled ? 'checked' : ''}>
+      <button aria-label="More dual sub controls" type="button" id="yle-dual-sub-more-button" class="dual-sub-more-button">
+        <svg width="27" height="27" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 9.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zm7 0a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zm7 0a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z"/>
+        </svg>
+      </button>
+
+      <div class="dual-sub-more-items" id="yle-dual-sub-more-items">
       <span class="dual-sub-warning" style="display: none;">
         <span class="dual-sub-warning__icon">
           !
@@ -632,6 +639,7 @@ async function addDualSubExtensionSection() {
       </button>
 
       <a href="https://finnish-streaming-dual-sub.netlify.app/updates" target="_blank" rel="noopener noreferrer" style="color: #f59e0b; font-size: 12px; font-weight: 700; white-space: nowrap; align-self: center; text-decoration: none; line-height: 1.3;">🔔 DeepL pricing<br/>update</a>
+      </div>
 
     </div>
   `
@@ -770,10 +778,21 @@ async function addDualSubExtensionSection() {
     }
   });
 
+  // "More" menu, only visible in narrow players (see styles.css)
+  const moreButton = document.getElementById('yle-dual-sub-more-button');
+  const moreItems = document.getElementById('yle-dual-sub-more-items');
+  moreButton.addEventListener('click', () => {
+    moreItems.classList.toggle('open');
+  });
+
   document.addEventListener('click', (e) => {
     // @ts-ignore - EventTarget is used as Node at runtime
     if (!warningPopover.contains(e.target) && !warningIcon.contains(e.target)) {
       warningPopover.classList.remove("active");
+    }
+    // @ts-ignore - EventTarget is used as Node at runtime
+    if (!moreButton.contains(e.target) && !moreItems.contains(e.target)) {
+      moreItems.classList.remove('open');
     }
     // @ts-ignore - EventTarget is used as Node at runtime
     if (!blurModeMenuButton.contains(e.target) && !blurModeDropdown.contains(e.target)) {
