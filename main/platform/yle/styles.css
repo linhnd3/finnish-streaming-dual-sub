@@ -1,9 +1,11 @@
 .dual-sub-extension-section {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 16px;
   padding: 4px 8px;
   justify-content: flex-start;
+  white-space: nowrap;
 }
 
 .dual-sub-extension-section svg {
@@ -439,4 +441,42 @@
   font-style: italic;
   color: #888;
   margin-right: 6px;
+}
+
+/* Narrow players (e.g. the inline player on yle.fi/selkouutiset):
+   let the toolbar wrap to its own row instead of pushing the player's
+   right controls (fullscreen...) out of view, and make it more compact. */
+[class*="PlayerUI__UI"] {
+  container-type: inline-size;
+}
+
+[class^="BottomControlBar__LeftControls"]:has(> .dual-sub-extension-section) {
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+@container (max-width: 1150px) {
+  .dual-sub-extension-section {
+    gap: 8px;
+  }
+
+  .dual-sub-extension-section svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  #yle-dual-sub-settings-button {
+    margin-left: 0 !important;
+  }
+
+  .dual-sub-blur-mode-label,
+  .dual-sub-extension-section > a[href$="/updates"] {
+    display: none;
+  }
+}
+
+@container (max-width: 600px) {
+  .dual-sub-extension-section > span:first-child {
+    display: none;
+  }
 }
