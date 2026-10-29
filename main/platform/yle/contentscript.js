@@ -446,6 +446,31 @@ function isVideoElementAppearMutation(mutation) {
   }
 }
 
+/**
+ * Check if the player's bottom control bar was just added while the extension section is missing.
+ *
+ * On yle.fi articles (e.g. Selkouutiset) the video element is added on page load,
+ * but the control bar only appears after the user presses play.
+ * @param {MutationRecord} mutation
+ * @returns {boolean}
+ */
+function isControlBarAppearWithoutExtensionSectionMutation(mutation) {
+  if (mutation.type !== "childList" || mutation.addedNodes.length === 0) {
+    return false;
+  }
+  const controlBarSelector = '[class^="BottomControlBar__LeftControls"]';
+  for (const node of Array.from(mutation.addedNodes)) {
+    if (node.nodeType !== Node.ELEMENT_NODE) {
+      continue;
+    }
+    const element = /** @type {HTMLElement} */ (node);
+    if (element.matches(controlBarSelector) || element.querySelector(controlBarSelector)) {
+      return !document.querySelector(".dual-sub-extension-section");
+    }
+  }
+  return false;
+}
+
 async function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -821,10 +846,18 @@ async function addDualSubExtensionSection() {
  */
 async function getVideoTitle() {
 
+  // On yle.fi articles (e.g. Selkouutiset) the player has no title element,
+  // and the URL can't be used either: yle.fi/selkouutiset shows a new broadcast every day.
+  // Use the heading of the article that holds the player instead,
+  // e.g. "Selkouutiset | torstai 29.10.2026".
+  const isYleArticlePage = location.hostname === "yle.fi";
+
   let titleElement = null;
 
   for (let attempt = 0; attempt < 8; attempt++) {
-    titleElement = document.querySelector('[class*="VideoTitle__Titles-"]');
+    titleElement = isYleArticlePage
+      ? document.querySelector('video')?.closest('article')?.querySelector('h1')
+      : document.querySelector('[class*="VideoTitle__Titles-"]');
     if (titleElement) {
       break;
     };
@@ -834,6 +867,10 @@ async function getVideoTitle() {
   if (!titleElement) {
     console.error("FinnishStreamingDualSubExtension: Cannot get movie name. Title Element is null.");
     return null;
+  }
+
+  if (isYleArticlePage) {
+    return titleElement.textContent.trim() || null;
   }
 
   const texts = Array.from(titleElement.querySelectorAll('span'))
@@ -899,6 +936,11 @@ const observer = new MutationObserver((mutations) => {
         });
         loadMovieCacheAndUpdateMetadata().then(() => { }).catch((error) => {
           console.error("FinnishStreamingDualSubExtension: Error populating shared translation map from cache:", error);
+        });
+      }
+      else if (isControlBarAppearWithoutExtensionSectionMutation(mutation)) {
+        addDualSubExtensionSection().then(() => { }).catch((error) => {
+          console.error("FinnishStreamingDualSubExtension: Error adding dual sub extension section:", error);
         });
       }
     }
